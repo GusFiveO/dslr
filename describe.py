@@ -1,16 +1,7 @@
 #!/usr/bin/env python3
 
-import polars as pl
 import sys
-
-
-def load_csv(pathname: str):
-    try:
-        content = pl.read_csv(pathname)
-        return content
-    except Exception as e:
-        print(e)
-        return None
+from utils import load_csv
 
 
 def describe(pathname: str):
