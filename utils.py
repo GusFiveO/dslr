@@ -2,6 +2,10 @@ import polars as pl
 import pandas as pd
 
 
+def print_usage():
+    print("usage: ./describe.py <filepath>")
+
+
 def load_csv(pathname: str):
     try:
         content = pl.read_csv(pathname)

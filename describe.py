@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from utils import load_csv, load_pandas_csv
+from utils import load_csv, load_pandas_csv, print_usage
 import numpy as np
 import polars as pl
 
@@ -125,9 +125,14 @@ def describe(df: pl.DataFrame):
 
 
 if __name__ == "__main__":
-    dataset_pathname = sys.argv[1]
+    try:
+        dataset_pathname = sys.argv[1]
+    except Exception:
+        print_usage()
+        exit()
     df = load_csv(dataset_pathname)
+    if df is None:
+        exit()
     df_pd = load_pandas_csv(dataset_pathname)
     describe(df)
-    # print(df.select(pl.selectors.numeric()).describe())
     print(df_pd.select_dtypes(include=np.number).describe())
