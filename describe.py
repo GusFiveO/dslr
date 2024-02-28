@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from utils import load_csv, load_pandas_csv, print_usage
+from utils import load_csv, load_pandas_csv, print_describe_usage
 import numpy as np
 import polars as pl
 
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     try:
         dataset_pathname = sys.argv[1]
     except Exception:
-        print_usage()
+        print_describe_usage()
         exit()
     df = load_csv(dataset_pathname)
     if df is None:

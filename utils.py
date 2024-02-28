@@ -2,8 +2,12 @@ import polars as pl
 import pandas as pd
 
 
-def print_usage():
+def print_describe_usage():
     print("usage: ./describe.py <filepath>")
+
+
+def print_histogram_usage():
+    print("usage: ./histogram.py <filepath>")
 
 
 def load_csv(pathname: str):
