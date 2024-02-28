@@ -51,7 +51,16 @@ def apply_std(column: pl.Series):
 def apply_first_quartile(column: pl.Series):
     sorted_column = column.sort()
     count = apply_count(column)
-    return sorted_column[count // 4]
+    index = (count - 1) / 4
+    if index.is_integer():
+        return sorted_column[int(index)]
+
+    lower_index = int(index)
+    upper_index = lower_index + 1
+    interpolation_factor = index - lower_index
+    return (1 - interpolation_factor) * sorted_column[
+        lower_index
+    ] + interpolation_factor * sorted_column[upper_index]
 
 
 def apply_median(column: pl.Series):
@@ -66,21 +75,16 @@ def apply_median(column: pl.Series):
 def apply_last_quartile(column: pl.Series):
     sorted_column = column.sort()
     count = apply_count(column)
-    last_index = count - 1
-    index = last_index - (count // 4)
-    return sorted_column[index]
+    index = 3 * (count - 1) / 4
+    if index.is_integer():
+        return sorted_column[int(index)]
 
-
-import math
-
-
-def apply_percentile(column: pl.Series, percent: int):
-    sorted_column = column.sort()
-    count = apply_count(column)
-    if count % 2:
-        index = math.ceil(percent / 100 * count)
-    index = math.floor(percent / 100 * count)
-    return sorted_column[index]
+    lower_index = int(index)
+    upper_index = lower_index + 1
+    interpolation_factor = index - lower_index
+    return (1 - interpolation_factor) * sorted_column[
+        lower_index
+    ] + interpolation_factor * sorted_column[upper_index]
 
 
 def describe(df: pl.DataFrame):
@@ -96,11 +100,8 @@ def describe(df: pl.DataFrame):
         std_value = apply_std(column)
         min_value = apply_min(column)
         first_quartile_value = apply_first_quartile(column)
-        # first_quartile_value = apply_percentile(column, 25)
         median_value = apply_median(column)
-        # median_value = apply_percentile(column, 50)
         last_quartile_value = apply_last_quartile(column)
-        # last_quartile_value = apply_percentile(column, 75)
         max_value = apply_max(column)
 
         temp_df = pl.DataFrame(
@@ -128,5 +129,5 @@ if __name__ == "__main__":
     df = load_csv(dataset_pathname)
     df_pd = load_pandas_csv(dataset_pathname)
     describe(df)
-    print(df.select(pl.selectors.numeric()).describe())
-    # print(df_pd.select_dtypes(include=np.number).describe())
+    # print(df.select(pl.selectors.numeric()).describe())
+    print(df_pd.select_dtypes(include=np.number).describe())
