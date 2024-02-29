@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import operator
 import matplotlib.pyplot as plt
 import matplotlib
 from describe import apply_mean, apply_std
@@ -13,26 +12,29 @@ matplotlib.use("TkAgg")
 def plot_score_distribution(df, sorted_course_names):
     ROW = 4
     COLUMN = 4
-    _, axs = plt.subplots(ROW, COLUMN, layout="constrained")
+    fig, axs = plt.subplots(ROW, COLUMN, layout="constrained")
     slytherin_df = df[df["Hogwarts House"] == "Slytherin"]
     gryffindor_df = df[df["Hogwarts House"] == "Gryffindor"]
     ravenclaw_df = df[df["Hogwarts House"] == "Ravenclaw"]
     hufflepuff_df = df[df["Hogwarts House"] == "Hufflepuff"]
 
     for idx, course_name in enumerate(sorted_course_names):
-        row = idx % ROW
-        col = idx // ROW
-        axs[col, row].set_title(
+        row = idx // ROW
+        col = idx % ROW
+        axs[row, col].set_title(
             f"{course_name[:10]}{'...' if len(course_name) > 10 else ''}"
         )
-        axs[col, row].hist(gryffindor_df[course_name], alpha=0.5)
-        axs[col, row].hist(slytherin_df[course_name], alpha=0.5)
-        axs[col, row].hist(ravenclaw_df[course_name], alpha=0.5)
-        axs[col, row].hist(hufflepuff_df[course_name], alpha=0.5)
+        axs[row, col].hist(gryffindor_df[course_name], alpha=0.5, label="gryffindor")
+        axs[row, col].hist(slytherin_df[course_name], alpha=0.5, label="slytherin")
+        axs[row, col].hist(ravenclaw_df[course_name], alpha=0.5, label="ravenclaw")
+        axs[row, col].hist(hufflepuff_df[course_name], alpha=0.5, label="hufflepuff")
     for i in range(13, 16):
-        row = i % ROW
-        col = i // ROW
-        axs[col, row].axis("off")
+        row = i // ROW
+        col = i % ROW
+        axs[row, col].axis("off")
+    handles, labels = axs[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower right")
+    fig.suptitle("Score distribution per courses", fontsize=16)
 
     plt.show()
 
