@@ -14,6 +14,11 @@
 
 ## 2.2 Corelation de Pearson
 
+To launch : 
+```bash
+./scatter_plot.py datasets/dataset_train.csv
+```
+
 La corelation de Pearson nous permet de voir sur une echelle de -1 (inverse) - 0 (aucun) - 1 (pareil) a quelle points deux variables d'un jeux de donne se resemble.
 
 La formule doit etre applique entre toutes les combinaisons des variables de notre dataframe: 
