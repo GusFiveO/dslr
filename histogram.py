@@ -2,7 +2,7 @@
 
 import matplotlib.pyplot as plt
 import matplotlib
-from describe import apply_mean, apply_std
+from ft_statistics import apply_mean, apply_std
 
 from utils import load_pandas_csv, z_score_normalize
 
