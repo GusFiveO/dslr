@@ -1,6 +1,8 @@
 import polars as pl
 import pandas as pd
 
+from describe import apply_mean, apply_std
+
 
 def print_describe_usage():
     print("usage: ./describe.py <filepath>")
@@ -26,3 +28,10 @@ def load_pandas_csv(pathname: str):
     except Exception as e:
         print(e)
         return None
+
+
+def z_score_normalize(column):
+    mean = apply_mean(column)
+    std = apply_std(column)
+    normalized_column = (column - mean) / std
+    return normalized_column

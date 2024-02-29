@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 
 import sys
+from ft_statistics import (
+    apply_count,
+    apply_first_quartile,
+    apply_last_quartile,
+    apply_max,
+    apply_mean,
+    apply_median,
+    apply_min,
+    apply_std,
+)
 from utils import load_csv, load_pandas_csv, print_describe_usage
 import numpy as np
 import polars as pl
@@ -8,83 +18,6 @@ import polars as pl
 label_column = {
     "statistic": ["count", "mean", "std", "min", "25%", "50%", "75%", "max"]
 }
-
-
-def apply_count(column: pl.Series):
-    count = 0
-    for row in column:
-        count += 1
-    return count
-
-
-def apply_min(column: pl.Series):
-    min = None
-    for row in column:
-        if min is None or row < min:
-            min = row
-    return min
-
-
-def apply_max(column: pl.Series):
-    max = None
-    for row in column:
-        if max is None or row > max:
-            max = row
-    return max
-
-
-def apply_mean(column: pl.Series):
-    count = apply_count(column)
-    return column.sum() / count
-
-
-def apply_std(column: pl.Series):
-    square_diff = 0
-    count = 0
-    mean = apply_mean(column)
-    for row in column:
-        square_diff += np.square(row - mean)
-        count += 1
-    return np.sqrt(square_diff / (count - 1))
-
-
-def apply_first_quartile(column: pl.Series):
-    sorted_column = column.sort()
-    count = apply_count(column)
-    index = (count - 1) / 4
-    if index.is_integer():
-        return sorted_column[int(index)]
-
-    lower_index = int(index)
-    upper_index = lower_index + 1
-    interpolation_factor = index - lower_index
-    return (1 - interpolation_factor) * sorted_column[
-        lower_index
-    ] + interpolation_factor * sorted_column[upper_index]
-
-
-def apply_median(column: pl.Series):
-    sorted_column = column.sort()
-    count = apply_count(column)
-    index = count // 2
-    if count % 2 == 0:
-        return (sorted_column[index - 1] + sorted_column[index]) / 2
-    return sorted_column[index]
-
-
-def apply_last_quartile(column: pl.Series):
-    sorted_column = column.sort()
-    count = apply_count(column)
-    index = 3 * (count - 1) / 4
-    if index.is_integer():
-        return sorted_column[int(index)]
-
-    lower_index = int(index)
-    upper_index = lower_index + 1
-    interpolation_factor = index - lower_index
-    return (1 - interpolation_factor) * sorted_column[
-        lower_index
-    ] + interpolation_factor * sorted_column[upper_index]
 
 
 def describe(df: pl.DataFrame):
