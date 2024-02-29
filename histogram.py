@@ -2,10 +2,9 @@
 
 import matplotlib.pyplot as plt
 import matplotlib
-import sys
 from describe import apply_mean, apply_std
 
-from utils import load_pandas_csv, print_histogram_usage, z_score_normalize
+from utils import load_pandas_csv, z_score_normalize
 
 matplotlib.use("TkAgg")
 
@@ -105,12 +104,7 @@ def get_homogeneous_distribution_course(df):
 
 
 if __name__ == "__main__":
-    try:
-        dataset_pathname = sys.argv[1]
-    except Exception:
-        print_histogram_usage()
-        exit()
-    df = load_pandas_csv(dataset_pathname)
+    df = load_pandas_csv("./datasets/dataset_train.csv")
     if df is None:
         exit()
     df = df.dropna()
