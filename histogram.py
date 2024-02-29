@@ -61,7 +61,24 @@ def z_score_normalize(column):
     return normalized_column
 
 
-def plot_homogeneous_distribution_course(df: pl.DataFrame):
+def plot_course_score_distribution(df, course_name):
+    gryffindor_scores = df[df["Hogwarts House"] == "Gryffindor"][course_name]
+    slytherin_scores = df[df["Hogwarts House"] == "Slytherin"][course_name]
+    ravenclaw_scores = df[df["Hogwarts House"] == "Ravenclaw"][course_name]
+    hufflepuff_scores = df[df["Hogwarts House"] == "Hufflepuff"][course_name]
+    _, ax = plt.subplots()
+    ax.hist(gryffindor_scores, alpha=0.5, label="Gryffindor")
+    ax.hist(slytherin_scores, alpha=0.5, label="Slytherin")
+    ax.hist(ravenclaw_scores, alpha=0.5, label="Ravenclaw")
+    ax.hist(hufflepuff_scores, alpha=0.5, label="Hufflepuff")
+    ax.set_title(course_name + " houses scores distribution")
+    ax.set_ylabel("number of students")
+    ax.set_xlabel("score")
+    plt.legend(loc="upper right")
+    plt.show()
+
+
+def get_homogeneous_distribution_course(df):
 
     course_name_list = [
         "Arithmancy",
@@ -82,24 +99,18 @@ def plot_homogeneous_distribution_course(df: pl.DataFrame):
     normalized_df = course_columns.apply(z_score_normalize)
     normalized_df["Hogwarts House"] = df["Hogwarts House"]
 
-    print(normalized_df.groupby("Hogwarts House").apply(lambda x: x.apply(apply_mean)))
     normalized_df = normalized_df.groupby("Hogwarts House").apply(
         lambda x: x.apply(apply_mean)
     )
 
-    print(normalized_df)
     min_std = None
-    best = None
-    dict_best = dict()
+    most_homogenous = None
     for column in normalized_df:
         tmp_std = apply_std(normalized_df[column])
-        dict_best[column] = tmp_std
         if min_std is None or tmp_std < min_std:
             min_std = tmp_std
-            best = column
-    print(best)
-    print(dict_best)
-    return None
+            most_homogenous = column
+    return most_homogenous
 
 
 if __name__ == "__main__":
@@ -113,4 +124,5 @@ if __name__ == "__main__":
         exit()
     df = df.dropna()
     plot_score_distribution(df)
-    plot_homogeneous_distribution_course(df)
+    most_homogenous_course = get_homogeneous_distribution_course(df)
+    plot_course_score_distribution(df, most_homogenous_course)
