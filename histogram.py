@@ -2,12 +2,10 @@
 
 import matplotlib.pyplot as plt
 import matplotlib
-import polars as pl
-import numpy as np
 import sys
-from describe import apply_mean, apply_std, describe
+from describe import apply_mean, apply_std
 
-from utils import load_csv, load_pandas_csv, print_histogram_usage
+from utils import load_pandas_csv, print_histogram_usage, z_score_normalize
 
 matplotlib.use("TkAgg")
 
@@ -15,7 +13,7 @@ matplotlib.use("TkAgg")
 def plot_score_distribution(df):
     ROW = 4
     COLUMN = 4
-    fig, axs = plt.subplots(ROW, COLUMN, layout="constrained")
+    _, axs = plt.subplots(ROW, COLUMN, layout="constrained")
     slytherin_df = df[df["Hogwarts House"] == "Slytherin"]
     gryffindor_df = df[df["Hogwarts House"] == "Gryffindor"]
     ravenclaw_df = df[df["Hogwarts House"] == "Ravenclaw"]
@@ -52,13 +50,6 @@ def plot_score_distribution(df):
         axs[col, row].axis("off")
 
     plt.show()
-
-
-def z_score_normalize(column):
-    mean = apply_mean(column)
-    std = apply_std(column)
-    normalized_column = (column - mean) / std
-    return normalized_column
 
 
 def plot_course_score_distribution(df, course_name):
