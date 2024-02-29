@@ -1,7 +1,7 @@
 import polars as pl
 import pandas as pd
 
-from describe import apply_mean, apply_std
+from ft_statistics import apply_mean, apply_std
 
 
 def print_describe_usage():
