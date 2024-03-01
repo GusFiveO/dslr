@@ -78,7 +78,10 @@ def scatter_matrix(df: pd.DataFrame):
         else:
             customize_label(axs[row, col].xaxis.label, course_name_list[col])
         if row == col:
-            axs[row, col].hist(df[course_name_list[row]])
+            axs[row, col].hist(gryffindor_scores[course_name_list[row]], alpha=0.5)
+            axs[row, col].hist(slytherin_scores[course_name_list[row]], alpha=0.5)
+            axs[row, col].hist(ravenclaw_scores[course_name_list[row]], alpha=0.5)
+            axs[row, col].hist(hufflepuff_scores[course_name_list[row]], alpha=0.5)
         else:
             axs[row, col].scatter(
                 gryffindor_scores[course_name_list[row]],
