@@ -51,10 +51,15 @@ def find_max_correlation(corr_matrix):
     return max_indices, max_corr_value
 
 def print_graph(data, a, b):
+    selections = data["Hogwarts House"].unique()
+
     var1 = data.columns[a]
     var2 = data.columns[b]
+
     plt.figure(figsize=(10, 6))
-    plt.scatter(data[var1], data[var2], alpha=0.5)
+    for selection in selections:
+        plt.scatter(data[data["Hogwarts House"] == selection][var1], data[data["Hogwarts House"] == selection][var2], alpha=0.5, label=selection)
+    ##plt.scatter(data[var1], data[var2], alpha=0.5)
     plt.title(f"Scatter Plot entre {var1} et {var2}")
     plt.xlabel(var1)
     plt.ylabel(var2)
@@ -69,7 +74,9 @@ if __name__ == "__main__":
         exit(1)
 
     df = load_pandas_csv(dataset_pathname)
+    X = df["Hogwarts House"]
     df = df.select_dtypes(include="number")
+
 
     ## Data clean, ready to get exploited
 
@@ -77,4 +84,5 @@ if __name__ == "__main__":
     corr = compute_correlation_matrix(df)
     a, b = find_max_correlation(corr)
     print(f"La paire de caractéristiques avec la corrélation maximale est: {df.columns[a[0]]} et {df.columns[a[1]]}")
+    df["Hogwarts House"] = X
     print_graph(df, a[0], a[1])
