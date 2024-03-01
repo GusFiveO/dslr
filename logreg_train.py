@@ -26,8 +26,8 @@ def gradient_descent(X, y, weights, learning_rate, iterations):
         h = sigmoid(np.dot(X, weights))
         gradient = np.dot(X.T, (h - y)) / m
         weights -= learning_rate * gradient
-        cost = compute_cost(X, y, weights)
-        cost_history.append(cost)
+        #cost = compute_cost(X, y, weights)
+        #cost_history.append(cost)
     
     return weights, cost_history
 
@@ -42,6 +42,8 @@ def transform_labels(y, class_label):
 def prepare_data(df, target_column):
     y = df[target_column]
     X = df.drop(target_column, axis=1)
+    X = X.drop("Care of Magical Creatures", axis=1)  # Supprimer la colonne "Care of Magical Creatures" (contient des valeurs manquantes
+    X = X.drop("Arithmancy", axis=1)  # Supprimer la colonne "Arithmancy" (contient des valeurs manquantes)
     X = X.select_dtypes(include="number")  # Garder seulement les colonnes numériques
     X = X.fillna(X.mean())  # Remplacer les valeurs manquantes par la moyenne
     X = (X - X.mean()) / X.std()  # Normalisation
@@ -54,6 +56,7 @@ def main():
 
     target_column = 'Hogwarts House'
     X, y = prepare_data(df, target_column)
+
     classes = y.unique()
     weights = {}
     learning_rate = 0.01
@@ -85,12 +88,10 @@ def main():
 
 
     reference_df = pd.read_csv(sys.argv[3])
-    comparison_df = results_df.copy()
-    comparison_df['Hogwarts House'] = reference_df['Hogwarts House']
 
+    nbr_false_elem = sum(reference_df["Hogwarts House"] != results_df["Hogwarts House"])
     # Calculer l'exactitude
-    accuracy = np.mean(comparison_df['Hogwarts House'] == comparison_df['Hogwarts House'])
-    print(f"Exactitude: {accuracy}")
+    print(f"Exactitude: {nbr_false_elem}")
 
     print("Weights:")
     print(weights)
