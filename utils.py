@@ -12,6 +12,10 @@ def print_histogram_usage():
     print("usage: ./histogram.py <filepath>")
 
 
+def print_logreg_usage():
+    print("usage: ./histogram.py <filepath>")
+
+
 def load_csv(pathname: str):
     try:
         content = pl.read_csv(pathname)
