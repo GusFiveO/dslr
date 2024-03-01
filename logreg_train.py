@@ -63,6 +63,36 @@ def main():
         initial_weights = np.zeros(X.shape[1])
         weights[class_label], _ = gradient_descent(X, y_transformed, initial_weights, learning_rate, iterations)
     # Ici, vous pouvez sauvegarder les poids dans un fichier pour une utilisation future
+
+    dfa = pd.read_csv(sys.argv[2])
+    Xb, yb = prepare_data(dfa, target_column)
+    predictions = []
+
+    for x in Xb:  # Pour chaque observation dans l'ensemble de test
+        probs = {class_label: sigmoid(np.dot(x, w)) for class_label, w in weights.items()}
+        # Choisir la classe avec la probabilité la plus élevée
+        predicted_class = max(probs, key=probs.get)
+        predictions.append(predicted_class)
+
+    print("Predictions:")
+    print(predictions)
+
+    results_df = pd.DataFrame(predictions, columns=['Hogwarts House'])
+    results_df.index.name = 'Index'
+
+    print("Results:")
+    print(results_df)
+
+
+    reference_df = pd.read_csv(sys.argv[3])
+    comparison_df = results_df.copy()
+    comparison_df['Hogwarts House'] = reference_df['Hogwarts House']
+
+    # Calculer l'exactitude
+    accuracy = np.mean(comparison_df['Hogwarts House'] == comparison_df['Hogwarts House'])
+    print(f"Exactitude: {accuracy}")
+
+    print("Weights:")
     print(weights)
 
 
