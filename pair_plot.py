@@ -58,7 +58,11 @@ def pd_scatter_matrix(df):
 
 
 def scatter_matrix(df: pd.DataFrame):
-    nb_feature = len(df.axes[1])
+    gryffindor_scores = df[df["Hogwarts House"] == "Gryffindor"]
+    slytherin_scores = df[df["Hogwarts House"] == "Slytherin"]
+    ravenclaw_scores = df[df["Hogwarts House"] == "Ravenclaw"]
+    hufflepuff_scores = df[df["Hogwarts House"] == "Hufflepuff"]
+    nb_feature = len(df.axes[1]) - 1
     fig, axs = plt.subplots(nb_feature, nb_feature)
     for i in range(nb_feature**2):
         row = i // nb_feature
@@ -77,9 +81,36 @@ def scatter_matrix(df: pd.DataFrame):
             axs[row, col].hist(df[course_name_list[row]])
         else:
             axs[row, col].scatter(
-                df[course_name_list[row]], df[course_name_list[col]], alpha=0.5, s=1
+                gryffindor_scores[course_name_list[row]],
+                gryffindor_scores[course_name_list[col]],
+                alpha=0.5,
+                s=2,
+                label="Gryffindor",
+            )
+            axs[row, col].scatter(
+                slytherin_scores[course_name_list[row]],
+                slytherin_scores[course_name_list[col]],
+                alpha=0.5,
+                s=2,
+                label="Slytherin",
+            )
+            axs[row, col].scatter(
+                ravenclaw_scores[course_name_list[row]],
+                ravenclaw_scores[course_name_list[col]],
+                alpha=0.5,
+                s=2,
+                label="Ravenclaw",
+            )
+            axs[row, col].scatter(
+                hufflepuff_scores[course_name_list[row]],
+                hufflepuff_scores[course_name_list[col]],
+                alpha=0.5,
+                s=2,
+                label="Hufflepuff",
             )
 
+    handles, labels = axs[0, 1].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower right")
     plt.subplots_adjust(top=0.90, bottom=0.25, left=0.2, wspace=0, hspace=0)
     plt.show()
 
@@ -88,6 +119,7 @@ if __name__ == "__main__":
     df = load_pandas_csv("./datasets/dataset_train.csv")
     if df is None:
         exit()
-    df = df[course_name_list]
+    df.dropna()
+    df = df[course_name_list + ["Hogwarts House"]]
     # pd_scatter_matrix(df)
     scatter_matrix(df)
