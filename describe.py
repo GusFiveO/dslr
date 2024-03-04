@@ -10,13 +10,16 @@ from ft_statistics import (
     apply_median,
     apply_min,
     apply_std,
+    apply_variance,
+    apply_skewness,
+    apply_kurtosis,
 )
 from utils import load_csv, load_pandas_csv, print_describe_usage
 import numpy as np
 import polars as pl
 
 label_column = {
-    "statistic": ["count", "mean", "std", "min", "25%", "50%", "75%", "max"]
+    "statistic": ["count", "mean", "std", "min", "25%", "50%", "75%", "max", "bonus_variance", "bonus_skewness", "bonus_kurtosis"]
 }
 
 
@@ -36,7 +39,9 @@ def describe(df: pl.DataFrame):
         median_value = apply_median(column)
         last_quartile_value = apply_last_quartile(column)
         max_value = apply_max(column)
-
+        bonus_variance = apply_variance(column)
+        bonus_skewness = apply_skewness(column)
+        bonus_kurtosis = apply_kurtosis(column)
         temp_df = pl.DataFrame(
             label_column
             | {
@@ -49,6 +54,9 @@ def describe(df: pl.DataFrame):
                     median_value,
                     last_quartile_value,
                     max_value,
+                    bonus_variance,
+                    bonus_skewness,
+                    bonus_kurtosis,
                 ]
             }
         )
@@ -63,9 +71,13 @@ if __name__ == "__main__":
     except Exception:
         print_describe_usage()
         exit()
-    df = load_csv(dataset_pathname)
-    if df is None:
+    try:
+        df = load_csv(dataset_pathname)
+        if df is None:
+            exit()
+        df_pd = load_pandas_csv(dataset_pathname)
+        describe(df)
+        print(df_pd.select_dtypes(include=np.number).describe())
+    except Exception as e:
+        print(e)
         exit()
-    df_pd = load_pandas_csv(dataset_pathname)
-    describe(df)
-    print(df_pd.select_dtypes(include=np.number).describe())

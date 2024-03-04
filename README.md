@@ -6,11 +6,20 @@
 ```
 
 ### Describe
+Le describe est une fonction d'analyse qui résume les principales caractéristiques statistiques d'un dataset.   
 
 ```bash
 ./describe.py datasets/dataset_train.csv
 ```
 
+
+- Moyenne : Indique la valeur moyenne des données, utile pour comprendre la tendance centrale.
+- Écart-Type : Mesure la dispersion des données autour de la moyenne, indiquant à quel point les valeurs sont étendues.
+- Minimum/Maximum : Les valeurs les plus petites et les plus grandes, montrant la plage de données.
+- Quartiles : Points de division qui partagent les données en quatre parties égales, aidant à comprendre la distribution.
+- Variance : Similaire à l'écart-type, mais élève les différences au carré, offrant une autre perspective de la dispersion.
+- Skewness : Révèle si les données sont symétriques ou si elles s'étendent plus d'un côté, indiquant l'asymétrie de la distribution.
+- Kurtosis : Mesure le degré de concentration des valeurs extrêmes dans une distribution, comparé à une distribution normale. Une haute kurtosis indique une concentration plus élevée de valeurs extrêmes.
 
 ## 2.2 Corelation de Pearson
 

@@ -76,3 +76,35 @@ def apply_last_quartile(column):
     return (1 - interpolation_factor) * sorted_column[
         lower_index
     ] + interpolation_factor * sorted_column[upper_index]
+
+def apply_variance(column):
+    count = apply_count(column)
+    mean = apply_mean(column)
+    sum = 0
+    for row in column:
+        sum += np.square(row - mean)
+    if (count - 1) == 0:
+        return 0
+    return sum / (count - 1)
+
+def apply_skewness(column):
+    count = apply_count(column)
+    mean = apply_mean(column)
+    std = apply_std(column)
+    sum = 0
+    for row in column:
+        sum += np.power(row - mean, 3)
+    if count == 0:
+        return 0
+    return sum / (count * np.power(std, 3))
+
+def apply_kurtosis(column):
+    count = apply_count(column)
+    mean = apply_mean(column)
+    std = apply_std(column)
+    sum = 0
+    for row in column:
+        sum += np.power(row - mean, 4)
+    if count == 0:
+        return 0
+    return sum / (count * np.power(std, 4)) - 3
