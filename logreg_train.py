@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 import argparse
+import random
 
 matplotlib.use("TkAgg")
 
@@ -43,6 +44,44 @@ def gradient_descent(X, y, weights, learning_rate, iterations):
     return weights, cost_history
 
 
+def gradient(features, targets, weights):
+
+    features_len = len(features)
+
+    sig = sigmoid(np.dot(features, weights))
+
+    return (1 / features_len) * np.dot(features.T, sig - targets)
+
+
+def stochastic_gradient_descent(features, targets, weights, learning_rate):
+    cost_history = list()
+    features_len = len(features)
+    for i in range(features_len):
+        tmp_features = features.T[:, [i]].T
+        tmp_targets = targets[[i]]
+        weights -= learning_rate * gradient(tmp_features, tmp_targets, weights)
+        cost = compute_cost(features, targets, weights)
+        # cost = compute_cost(tmp_features, tmp_targets, weights)
+        cost_history.append(cost)
+
+    return weights, cost_history
+
+
+def mini_batch_gradient_descent(features, targets, weights, learning_rate, batch_size):
+    cost_history = list()
+    features_len = len(features)
+    for i in range(0, features_len, batch_size):
+        print(i)
+        batch_rows = [row for row in range(i, i + batch_size) if row < features_len]
+        tmp_features = features.T[:, batch_rows].T
+        tmp_targets = targets[batch_rows]
+        weights -= learning_rate * gradient(tmp_features, tmp_targets, weights)
+        cost = compute_cost(features, targets, weights)
+        # cost = compute_cost(tmp_features, tmp_targets, weights)
+        cost_history.append(cost)
+    return weights, cost_history
+
+
 def transform_labels(y, class_label):
     return np.where(y == class_label, 1, 0)
 
@@ -75,7 +114,7 @@ def parsing_args():
     )
     parser.add_argument(
         "-gradient",
-        choices=["standard", "stochastic"],
+        choices=["batch", "stochastic", "mini_batch"],
         help="Choisir le type de descente de gradient à utiliser.",
     )
     parser.add_argument(
@@ -92,13 +131,13 @@ def parsing_args():
 
         print(f"Affichage de l'historique des coûts pour {args.show}")
         for element in args.show:
-            ## si element n'est pas dans tab
+            # si element n'est pas dans tab
             if element not in tab:
                 print(f"La maison {element} n'existe pas")
                 print(f"Les maisons existantes sont: {tab}")
                 exit(1)
 
-        ## On enleve les doublons
+        # On enleve les doublons
         args.show = list(set(args.show))
 
     if args.gradient:
@@ -108,9 +147,11 @@ def parsing_args():
     if args.fichier:
         print(f"Le fichier à analyser est {args.fichier}")
         if args.fichier != "datasets/dataset_train.csv":
-            print(f"Le fichier à analyser doit être datasets/dataset_train.csv")
+            print("Le fichier à analyser doit être datasets/dataset_train.csv")
             exit(1)
 
+    if args.gradient is None:
+        args.gradient = "batch"
     return args
 
 
@@ -126,17 +167,27 @@ def main():
     classes = y.unique()
     weights = {}
     learning_rate = 0.01
-    iterations = 5000
+    iterations = 1000
     for class_label in classes:
         y_transformed = transform_labels(y, class_label)
         initial_weights = np.zeros(X.shape[1])
-        weights[class_label], _ = gradient_descent(
-            X, y_transformed, initial_weights, learning_rate, iterations
-        )
+        history_cost = list()
+        if args.gradient == "batch":
+            weights[class_label], history_cost = gradient_descent(
+                X, y_transformed, initial_weights, learning_rate, iterations
+            )
+        elif args.gradient == "stochastic":
+            weights[class_label], history_cost = stochastic_gradient_descent(
+                X, y_transformed, initial_weights, learning_rate
+            )
+        elif args.gradient == "mini_batch":
+            weights[class_label], history_cost = mini_batch_gradient_descent(
+                X, y_transformed, initial_weights, learning_rate, 4
+            )
         if args.show is not None and class_label in args.show:
             ## Print the cost history for Ravenclaw
             ## using graphique to see the cost history
-            plt.plot(_)
+            plt.plot(history_cost)
             plt.xlabel("Iterations")
             plt.ylabel("Cost")
             plt.title("Cost History for {}".format(class_label))
