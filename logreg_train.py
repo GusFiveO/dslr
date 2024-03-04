@@ -5,9 +5,11 @@ from utils import load_pandas_csv
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import argparse
 
 def print_usage():
     print("Usage: ./logreg_train.py dataset_pathname")
+
 
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
@@ -52,9 +54,47 @@ def prepare_data(df, target_column):
     X = np.hstack((np.ones((X.shape[0], 1)), X))  # Ajout d'une colonne de biais
     return X, y
 
+def  parsing_args():
+    parser = argparse.ArgumentParser(description='Votre programme de régression logistique.')
+    parser.add_argument('fichier', type=str, help="Le chemin du fichier à analyser.\n\n Doit etre placer en premier")
+    parser.add_argument('-gradient', choices=['standard', 'stochastic'], help="Choisir le type de descente de gradient à utiliser.")
+    parser.add_argument('-show', nargs='+', help="Afficher l'historique des coûts pour les maisons spécifiées: Gryffindor, Hufflepuff, Ravenclaw, Slytherin.\n\nExemple:./logreg_train.py datasets/dataset_train.csv -show Gryffindor Hufflepuff Ravenclaw Slytherin")
+
+    args = parser.parse_args()
+    
+    if args.show:
+        # Afficher l'historique des coûts pour les maisons spécifiées
+        tab = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
+
+        print(f"Affichage de l'historique des coûts pour {args.show}")
+        for element in args.show:
+            ## si element n'est pas dans tab
+            if element not in tab:
+                print(f"La maison {element} n'existe pas")
+                print(f"Les maisons existantes sont: {tab}")
+                exit(1)
+        
+        ## On enleve les doublons
+        args.show = list(set(args.show))
+        
+    if args.gradient:
+        # Choisir le type de gradient
+        print(f"Utilisation du gradient {args.gradient}")
+        
+
+    if (args.fichier):
+        print(f"Le fichier à analyser est {args.fichier}")
+        if (args.fichier != "datasets/dataset_train.csv"):
+            print(f"Le fichier à analyser doit être datasets/dataset_train.csv")
+            exit(1)
+ 
+    return args
 
 def main():
-    df = pd.read_csv(sys.argv[1])
+
+    args = parsing_args() 
+
+    df = pd.read_csv(args.fichier)
 
     target_column = 'Hogwarts House'
     X, y = prepare_data(df, target_column)
@@ -62,12 +102,12 @@ def main():
     classes = y.unique()
     weights = {}
     learning_rate = 0.01
-    iterations = 10000
+    iterations = 5000
     for class_label in classes:
         y_transformed = transform_labels(y, class_label)
         initial_weights = np.zeros(X.shape[1])
         weights[class_label], _ = gradient_descent(X, y_transformed, initial_weights, learning_rate, iterations)
-        if (class_label == "Ravenclaw"):
+        if (args.show is not None and class_label in args.show):
             ## Print the cost history for Ravenclaw
             ## using graphique to see the cost history
             plt.plot(_)
@@ -85,11 +125,11 @@ def main():
 
 
 if __name__ == "__main__":
-    try:
-        dataset_pathname = sys.argv[1]
-    except Exception:
-        print_usage()
-        exit(1)
+##    try:
+        ##dataset_pathname = sys.argv[1]
+    ##except Exception:
+        ##print_usage()
+        ##exit(1)
     try :
         main()
     except Exception as e:
