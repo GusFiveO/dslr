@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-import sys
-from utils import load_pandas_csv
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 import argparse
 import random
+
+matplotlib.use("TkAgg")
+
 
 matplotlib.use("TkAgg")
 
@@ -53,12 +54,13 @@ def gradient(features, targets, weights):
     return (1 / features_len) * np.dot(features.T, sig - targets)
 
 
-def stochastic_gradient_descent(features, targets, weights, learning_rate):
+def stochastic_gradient_descent(features, targets, weights, learning_rate, iterations):
     cost_history = list()
     features_len = len(features)
-    for i in range(features_len):
-        tmp_features = features.T[:, [i]].T
-        tmp_targets = targets[[i]]
+    for _ in range(iterations):
+        rand_index = random.randint(0, features_len - 1)
+        tmp_features = features.T[:, [rand_index]].T
+        tmp_targets = targets[[rand_index]]
         weights -= learning_rate * gradient(tmp_features, tmp_targets, weights)
         cost = compute_cost(features, targets, weights)
         # cost = compute_cost(tmp_features, tmp_targets, weights)
@@ -89,17 +91,13 @@ def transform_labels(y, class_label):
 def prepare_data(df, target_column):
     y = df[target_column]
     X = df.drop(target_column, axis=1)
-    X = X.drop(
-        "Care of Magical Creatures", axis=1
-    )  # Supprimer la colonne "Care of Magical Creatures" (contient des valeurs manquantes
-    X = X.drop(
-        "Arithmancy", axis=1
-    )  # Supprimer la colonne "Arithmancy" (contient des valeurs manquantes)
+    X = X.drop("Care of Magical Creatures", axis=1)
+    X = X.drop("Arithmancy", axis=1)
     X = X.drop("Astronomy", axis=1)
-    X = X.select_dtypes(include="number")  # Garder seulement les colonnes numériques
-    X = X.fillna(X.mean())  # Remplacer les valeurs manquantes par la moyenne
-    X = (X - X.mean()) / X.std()  # Normalisation
-    X = np.hstack((np.ones((X.shape[0], 1)), X))  # Ajout d'une colonne de biais
+    X = X.select_dtypes(include="number")
+    X = X.fillna(X.mean())
+    X = (X - X.mean()) / X.std()
+    X = np.hstack((np.ones((X.shape[0], 1)), X))
     return X, y
 
 
@@ -126,22 +124,18 @@ def parsing_args():
     args = parser.parse_args()
 
     if args.show:
-        # Afficher l'historique des coûts pour les maisons spécifiées
         tab = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
 
         print(f"Affichage de l'historique des coûts pour {args.show}")
         for element in args.show:
-            # si element n'est pas dans tab
             if element not in tab:
                 print(f"La maison {element} n'existe pas")
                 print(f"Les maisons existantes sont: {tab}")
                 exit(1)
 
-        # On enleve les doublons
         args.show = list(set(args.show))
 
     if args.gradient:
-        # Choisir le type de gradient
         print(f"Utilisation du gradient {args.gradient}")
 
     if args.fichier:
@@ -178,22 +172,19 @@ def main():
             )
         elif args.gradient == "stochastic":
             weights[class_label], history_cost = stochastic_gradient_descent(
-                X, y_transformed, initial_weights, learning_rate
+                X, y_transformed, initial_weights, learning_rate, iterations
             )
         elif args.gradient == "mini_batch":
             weights[class_label], history_cost = mini_batch_gradient_descent(
                 X, y_transformed, initial_weights, learning_rate, 4
             )
         if args.show is not None and class_label in args.show:
-            ## Print the cost history for Ravenclaw
-            ## using graphique to see the cost history
             plt.plot(history_cost)
             plt.xlabel("Iterations")
             plt.ylabel("Cost")
             plt.title("Cost History for {}".format(class_label))
             plt.show()
 
-    ## Sauvegarde des poids dans un fichier
     np.save("weights.npy", weights)
     exit(1)
 
