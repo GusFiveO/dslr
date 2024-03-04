@@ -190,14 +190,8 @@ def main():
 
 
 if __name__ == "__main__":
-    ##    try:
-    ##dataset_pathname = sys.argv[1]
-    ##except Exception:
-    ##print_usage()
-    ##exit(1)
     try:
         main()
     except Exception as e:
         print(e)
         exit(1)
-    pass

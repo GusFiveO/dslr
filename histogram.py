@@ -97,12 +97,16 @@ def get_homogeneous_distribution_course(df):
 
 
 if __name__ == "__main__":
-    df = load_pandas_csv("./datasets/dataset_train.csv")
-    if df is None:
+    try :
+        df = load_pandas_csv("./datasets/dataset_train.csv")
+        if df is None:
+            exit()
+        df = df.dropna()
+        most_homogenous_course, sorted_course_names = get_homogeneous_distribution_course(
+            df
+        )
+        plot_score_distribution(df, sorted_course_names)
+        plot_course_score_distribution(df, most_homogenous_course)
+    except Exception as e:
+        print(e)
         exit()
-    df = df.dropna()
-    most_homogenous_course, sorted_course_names = get_homogeneous_distribution_course(
-        df
-    )
-    plot_score_distribution(df, sorted_course_names)
-    plot_course_score_distribution(df, most_homogenous_course)

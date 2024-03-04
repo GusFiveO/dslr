@@ -14,4 +14,8 @@ def install_requirements():
 
 
 if __name__ == "__main__":
-    install_requirements()
+    try:
+        install_requirements()
+    except Exception as e:
+        print(e)
+        exit()

@@ -119,10 +119,13 @@ def scatter_matrix(df: pd.DataFrame):
 
 
 if __name__ == "__main__":
-    df = load_pandas_csv("./datasets/dataset_train.csv")
-    if df is None:
+    try:
+        df = load_pandas_csv("./datasets/dataset_train.csv")
+        if df is None:
+            exit()
+        df.dropna()
+        df = df[course_name_list + ["Hogwarts House"]]
+        scatter_matrix(df)
+    except Exception as e:
+        print(e)
         exit()
-    df.dropna()
-    df = df[course_name_list + ["Hogwarts House"]]
-    # pd_scatter_matrix(df)
-    scatter_matrix(df)

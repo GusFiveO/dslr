@@ -7,8 +7,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def print_usage():
-    print("Usage: scatter_plot.py dataset_pathname")
 
 
 def pearson_correlation(X, Y):
@@ -79,21 +77,22 @@ def print_graph(data, a, b):
 
 if __name__ == "__main__":
     try:
-        dataset_pathname = sys.argv[1]
-    except Exception:
-        print_usage()
+        df = load_pandas_csv("./datasets/dataset_train.csv")
+        if df is None:
+            exit(1)
+
+        X = df["Hogwarts House"]
+        df = df.select_dtypes(include="number")
+
+        ## Data clean, ready to get exploited
+
+        corr = compute_correlation_matrix(df)
+        a, b = find_max_correlation(corr)
+        print(
+            f"La paire de caractéristiques avec la corrélation maximale est: {df.columns[a[0]]} et {df.columns[a[1]]}"
+        )
+        df["Hogwarts House"] = X
+        print_graph(df, a[0], a[1])
+    except Exception as e:
+        print(e)
         exit(1)
-
-    df = load_pandas_csv(dataset_pathname)
-    X = df["Hogwarts House"]
-    df = df.select_dtypes(include="number")
-
-    ## Data clean, ready to get exploited
-
-    corr = compute_correlation_matrix(df)
-    a, b = find_max_correlation(corr)
-    print(
-        f"La paire de caractéristiques avec la corrélation maximale est: {df.columns[a[0]]} et {df.columns[a[1]]}"
-    )
-    df["Hogwarts House"] = X
-    print_graph(df, a[0], a[1])
