@@ -4,6 +4,7 @@ import sys
 from utils import load_pandas_csv
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def print_usage():
     print("Usage: ./logreg_train.py dataset_pathname")
@@ -22,12 +23,13 @@ def gradient_descent(X, y, weights, learning_rate, iterations):
     m = len(y)
     cost_history = []
 
+
     for i in range(iterations):
         h = sigmoid(np.dot(X, weights))
         gradient = np.dot(X.T, (h - y)) / m
         weights -= learning_rate * gradient
-        #cost = compute_cost(X, y, weights)
-        #cost_history.append(cost)
+        cost = compute_cost(X, y, weights)
+        cost_history.append(cost)
     
     return weights, cost_history
 
@@ -60,41 +62,25 @@ def main():
     classes = y.unique()
     weights = {}
     learning_rate = 0.01
-    iterations = 1000
+    iterations = 10000
     for class_label in classes:
         y_transformed = transform_labels(y, class_label)
         initial_weights = np.zeros(X.shape[1])
         weights[class_label], _ = gradient_descent(X, y_transformed, initial_weights, learning_rate, iterations)
-    # Ici, vous pouvez sauvegarder les poids dans un fichier pour une utilisation future
-
-    dfa = pd.read_csv(sys.argv[2])
-    Xb, yb = prepare_data(dfa, target_column)
-    predictions = []
-
-    for x in Xb:  # Pour chaque observation dans l'ensemble de test
-        probs = {class_label: sigmoid(np.dot(x, w)) for class_label, w in weights.items()}
-        # Choisir la classe avec la probabilité la plus élevée
-        predicted_class = max(probs, key=probs.get)
-        predictions.append(predicted_class)
-
-    print("Predictions:")
-    print(predictions)
-
-    results_df = pd.DataFrame(predictions, columns=['Hogwarts House'])
-    results_df.index.name = 'Index'
-
-    print("Results:")
-    print(results_df)
+        if (class_label == "Ravenclaw"):
+            ## Print the cost history for Ravenclaw
+            ## using graphique to see the cost history
+            plt.plot(_)
+            plt.xlabel('Iterations')
+            plt.ylabel('Cost')
+            plt.title('Cost History for {}'.format(class_label))
+            plt.show()
 
 
-    reference_df = pd.read_csv(sys.argv[3])
 
-    nbr_false_elem = sum(reference_df["Hogwarts House"] != results_df["Hogwarts House"])
-    # Calculer l'exactitude
-    print(f"Exactitude: {nbr_false_elem}")
-
-    print("Weights:")
-    print(weights)
+    ## Sauvegarde des poids dans un fichier
+    np.save('weights.npy', weights)        
+    exit(1)
 
 
 
@@ -104,5 +90,9 @@ if __name__ == "__main__":
     except Exception:
         print_usage()
         exit(1)
-    main()
+    try :
+        main()
+    except Exception as e:
+        print(e)
+        exit(1)
     pass
