@@ -1,2 +1,4 @@
 /__pycache__/
 /datasets/test.csv
+houses.csv
+weights.npy
