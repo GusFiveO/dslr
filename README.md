@@ -92,7 +92,7 @@ De plus, il faut la normaliser :
 $$X = \frac{X - \text{mean}(X)}{\text{std}(X)}$$
 
 
-Une fois la data clean, il faut passer a la descente de gradint avec la derive de la loss function : 
+Une fois la data clean, il faut passer a la descente de gradient avec la derive de la loss function : 
 
 $$
 \frac{\partial}{\partial \theta_j} J(\theta) = \frac{1}{m} \sum_{i=1}^{m} \left( h_\theta(x^{(i)}) - y^{(i)} \right) x_j^{(i)}
